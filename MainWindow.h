@@ -29,8 +29,8 @@ private:
     OverviewWidget* overviewWidget;
 
     QString currentFileName;
-    void saveProject(QString fileName);
-    void openProject(QString fileName);
+    void saveProject(const QString& fileName);
+    void openProject(const QString& fileName);
 
 public slots:
     void newFile();

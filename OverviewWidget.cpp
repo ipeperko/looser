@@ -2,29 +2,6 @@
 #include <QDebug>
 #include <QVBoxLayout>
 
-OverviewWidget::OverviewWidget(QWidget* parent, RoomTree* tree, BuildingWidget* building)
-    : QWidget(parent)
-    , tree(tree)
-    , building(building)
-{
-    QVBoxLayout* layout = new QVBoxLayout;
-    this->setLayout(layout);
-
-    buttCalc = new QPushButton(tr("Overview"));
-    area = new QTextEdit;
-
-    layout->addWidget(buttCalc);
-    layout->addWidget(area);
-
-    QFont font = area->font();
-    font.setFamily("Monospace");
-    font.setPointSize(font.pointSize() - 2);
-    area->setFont(font);
-    area->setText(tr("Press ..."));
-
-    connect(buttCalc, SIGNAL(clicked()), this, SLOT(calculate()));
-}
-
 struct FloorResult
 {
     double Qtot;
@@ -39,6 +16,29 @@ struct FloorResult
         Qtot = Qtrans = Qvent = A = V = 0;
     }
 };
+
+OverviewWidget::OverviewWidget(QWidget* parent, RoomTree* tree, BuildingWidget* building)
+    : QWidget(parent)
+    , tree(tree)
+    , building(building)
+{
+    QVBoxLayout* layout = new QVBoxLayout;
+    setLayout(layout);
+
+    buttCalc = new QPushButton(tr("Overview"));
+    area = new QTextEdit;
+
+    layout->addWidget(buttCalc);
+    layout->addWidget(area);
+
+    QFont font = area->font();
+    font.setFamily("Monospace");
+    font.setPointSize(font.pointSize() - 2);
+    area->setFont(font);
+    area->setText(tr("Press ..."));
+
+    connect(buttCalc, &QPushButton::clicked, this, &OverviewWidget::calculate);
+}
 
 std::string& numFormat(std::string& str, double num, unsigned N = 10)
 {
@@ -186,15 +186,12 @@ void OverviewWidget::calculate()
     double A = 0;
     double V = 0;
 
-    for (auto it = floorVec.begin(); it != floorVec.end(); ++it) {
-
-        FloorResult* F = &*it;
-
-        Qtot += F->Qtot;
-        Qtrans += F->Qtrans;
-        Qvent += F->Qvent;
-        A += F->A;
-        V += F->V;
+    for (auto& it : floorVec) {
+        Qtot += it.Qtot;
+        Qtrans += it.Qtrans;
+        Qvent += it.Qvent;
+        A += it.A;
+        V += it.V;
     }
 
     std::string NameStr, QtotStr, QtransStr, QventStr, AStr, VStr, Qm2Str, Qm3Str;

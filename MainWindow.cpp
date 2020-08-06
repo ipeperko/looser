@@ -12,8 +12,6 @@
 #define ss_last_opened_dir "last_opened_dir"
 #define ss_mainwindow_pos "mainwindow_pos"
 
-QSettings settings;
-
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -70,6 +68,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(coeffWidget, &CoeffWidget::dataChanged, roomTree, (void (RoomTree::*)())(&RoomTree::selectionChanged));
 
     roomTree->setGeometry(0, 0, 200, roomTree->height());
+
+    QSettings settings;
     setGeometry(settings.value(ss_mainwindow_pos, QRect(0, 0, 1000, 600)).toRect());
 }
 
@@ -79,10 +79,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
+    QSettings settings;
     settings.setValue(ss_mainwindow_pos, geometry());
 }
 
-void MainWindow::openProject(QString fileName)
+void MainWindow::openProject(const QString& fileName)
 {
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -122,7 +123,7 @@ void MainWindow::newFile()
     QMessageBox::critical(this, tr("Error"), "TODO: new file ");
 }
 
-void MainWindow::saveProject(QString fileName)
+void MainWindow::saveProject(const QString& fileName)
 {
     //	qDebug() << "Saving project";
 
@@ -147,6 +148,8 @@ void MainWindow::saveProject(QString fileName)
 
 void MainWindow::save()
 {
+    QSettings settings;
+
     if (currentFileName.size()) {
         try {
             saveProject(currentFileName);
@@ -163,6 +166,7 @@ void MainWindow::save()
 
 void MainWindow::saveAs()
 {
+    QSettings settings;
     QString dir = settings.value(ss_last_opened_dir).toString();
     currentFileName = QFileDialog::getSaveFileName(this, "Open simmulation file", dir);
 
@@ -176,6 +180,7 @@ void MainWindow::saveAs()
 
 void MainWindow::open()
 {
+    QSettings settings;
     QString dir = settings.value(ss_last_opened_dir).toString();
     currentFileName = QFileDialog::getOpenFileName(this, "Open simmulation file", dir);
     qDebug() << "Dialog: " << currentFileName;

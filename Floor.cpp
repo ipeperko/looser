@@ -10,13 +10,6 @@ Floor::~Floor()
 {
 }
 
-//Room *Floor::addRoom(const std::string &name)
-//{
-//    Room* R = new Room(name);
-//    appendRow(R);
-//    return R;
-//}
-
 void Floor::removeRoom(int id)
 {
     removeRow(id);

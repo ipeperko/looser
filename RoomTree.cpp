@@ -67,7 +67,7 @@ void RoomTree::selectionChanged(QModelIndex s)
     if (isValid) {
         int floorId = parent.row();
         int roomId = s.row();
-        Floor* F = dynamic_cast<Floor*>(rootNode->child(floorId));
+        auto* F = dynamic_cast<Floor*>(rootNode->child(floorId));
         Room* R = F->room(roomId);
         if (R) {
             roomWidget->currentRoomChanged(R);
@@ -143,7 +143,7 @@ void RoomTree::removeRoom(int floor_id, int id)
         return;
     }
 
-    Floor* f = dynamic_cast<Floor*>(rootNode->child(floor_id));
+    auto* f = dynamic_cast<Floor*>(rootNode->child(floor_id));
     f->removeRoom(id);
 }
 
@@ -207,7 +207,7 @@ Room* RoomTree::duplicateRoom()
     Floor* f = floor(treeView->selectionModel()->currentIndex(), floor_id);
     if (f) {
         //qDebug() << index.parent().data(Qt::DisplayRole).toString() << index.row();
-        Room* newRoom = addRoom(floor_id, src->text().toStdString().c_str());
+        Room* newRoom = addRoom(floor_id, src->text().toStdString());
         *newRoom = *src;
         return newRoom;
     }
@@ -266,7 +266,7 @@ Floor* RoomTree::floor(int id)
 Floor* RoomTree::addFloor(const std::string& name)
 {
     qDebug("Adding floor");
-    Floor* f = new Floor(name);
+    auto* f = new Floor(name);
     rootNode->appendRow(f);
     return f;
 }
@@ -336,6 +336,7 @@ void RoomTree::menuRequest(QPoint point)
         }
     }
     else {
+        return;
     }
 
     menu->addAction(actionTestPrint);

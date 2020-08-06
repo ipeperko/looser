@@ -43,7 +43,7 @@ void Room::element2Temp(int i)
 
 ElementData* Room::insertElement(int i)
 {
-    std::vector<ElementData>::iterator it = elements.begin() + i;
+    auto it = elements.begin() + i;
     elements.insert(it, ElementData(roomWidget->building(), elements));
     it = elements.begin() + i;
     return &*(it);
@@ -52,12 +52,9 @@ ElementData* Room::insertElement(int i)
 double Room::transLosses()
 {
     double Q = 0;
-
-    for (std::vector<ElementData>::iterator it = elements.begin(); it != elements.end(); ++it) {
-        ElementData* e = &*it;
-        Q += e->Q(t);
+    for (auto& it : elements) {
+        Q += it.Q(t);
     }
-
     return Q;
 }
 
@@ -103,14 +100,14 @@ double ElementData::Anetto()
 
 double ElementData::Q(double tIndoor)
 {
-    double _Q;
+    double q;
     if (surfaceBehind() == behind_t::ExternAir) {
-        _Q = UeqValue() * Anetto() * (tIndoor - building->outdoorTemperature());
+        q = UeqValue() * Anetto() * (tIndoor - building->outdoorTemperature());
     }
     else {
-        _Q = UeqValue() * Anetto() * (tIndoor - t_surf);
+        q = UeqValue() * Anetto() * (tIndoor - t_surf);
     }
-    return _Q;
+    return q;
 }
 
 dbm::xml::model Room::xmlModel()
@@ -138,9 +135,9 @@ void Room::toXML(dbm::xml::node& xml)
 {
     xmlModel().to_xml(xml);
 
-    for (std::vector<ElementData>::iterator it = elements.begin(); it != elements.end(); ++it) {
+    for (auto& it : elements) {
         auto& item = xml.add("element");
-        it->xmlModel().to_xml(item);
+        it.xmlModel().to_xml(item);
     }
 }
 
@@ -164,13 +161,13 @@ void Room::fromXML(const dbm::xml::node& xml, CoeffWidget* coeffs)
 {
     xmlModel().from_xml(xml);
 
-    for (auto it = xml.begin(); it != xml.end(); ++it) {
+    for (auto const& it : xml) {
 
-        if (it->tag() != "element")
+        if (it.tag() != "element")
             continue;
 
         ElementData* el = addElement();
-        el->xmlModel().from_xml(*it);
+        el->xmlModel().from_xml(it);
 
         int pos;
         kElement* k = coeffs->k(el->kElementID(), pos);

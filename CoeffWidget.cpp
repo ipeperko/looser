@@ -26,7 +26,7 @@ CoeffWidget::CoeffWidget(QWidget* parent)
     buttonAddRow = new QPushButton(tr("Add row"));
     mainLayout->addWidget(table);
     mainLayout->addWidget(buttonAddRow);
-    this->setLayout(mainLayout);
+    setLayout(mainLayout);
 
     QStringList colNames;
     colNames.append(tr("Element"));
@@ -46,11 +46,10 @@ CoeffWidget::CoeffWidget(QWidget* parent)
 kElement* CoeffWidget::k(unsigned uniqid, int& pos)
 {
     pos = 0;
-    for (std::list<kElement>::iterator it = klist.begin(); it != klist.end(); ++it) {
-
+    for (auto& it : klist) {
         ++pos;
-        if (uniqid == it->uniqueID()) {
-            return &*it;
+        if (uniqid == it.uniqueID()) {
+            return &it;
         }
     }
 
@@ -69,7 +68,7 @@ kElement* CoeffWidget::addElement(int pos)
     if (pos < 0 || (unsigned) pos > nElements()) {
         return nullptr;
     }
-    std::list<kElement>::iterator it = klist.begin();
+    auto it = klist.begin();
     std::advance(it, pos);
     klist.insert(it, kElement());
     --it;
@@ -208,14 +207,14 @@ void CoeffWidget::menuRequest(QPoint point)
 {
     QModelIndex index = table->indexAt(point);
     qDebug() << "Menu request" << index;
-    QMenu* menu = new QMenu(this);
+    auto* menu = new QMenu(this);
 
-    QAction* actionCopy = new QAction(tr("Copy element"), this);
-    QAction* actionPaste = new QAction(tr("Paste element"), this);
-    QAction* actionAddRow = new QAction(tr("Add row"), this);
-    QAction* actionRemoveRow = new QAction(tr("Remove row"), this);
-    QAction* actionInsertRow = new QAction(tr("Insert row"), this);
-    QAction* actionPrintList = new QAction(tr("Print list"), this);
+    auto* actionCopy = new QAction(tr("Copy element"), this);
+    auto* actionPaste = new QAction(tr("Paste element"), this);
+    auto* actionAddRow = new QAction(tr("Add row"), this);
+    auto* actionRemoveRow = new QAction(tr("Remove row"), this);
+    auto* actionInsertRow = new QAction(tr("Insert row"), this);
+    auto* actionPrintList = new QAction(tr("Print list"), this);
 
     menu->addAction(actionCopy);
     menu->addAction(actionPaste);
@@ -261,16 +260,17 @@ void CoeffWidget::toXML(dbm::xml::node& xml)
 /* @xml: example string: [ <kvalue> ... </kvalue><kvalue> ... </kvalue> ... ] */
 void CoeffWidget::fromXML(const dbm::xml::node& xml)
 {
-    this->removeAll();
+    removeAll();
     counter = 0;
 
-    for (auto it = xml.begin(); it != xml.end(); ++it) {
-        this->addRow(false);
+    for (auto& it : xml) {
+
+        addRow(false);
         int r = table->rowCount() - 1;
 
         kElement& kItem_ = klist.back();
         auto model = kItem_.xmlModel();
-        model.from_xml(*it);
+        model.from_xml(it);
 
         if (kItem_.uniqueID() > counter)
             counter = kItem_.uniqueID();
